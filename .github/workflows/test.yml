@@ -36,3 +36,23 @@ jobs:
             echo "Error: dist/test.bin is missing!"
             exit 1
           fi
+  test-no-run:
+    name: Test Without Running
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the Git repository
+        uses: actions/checkout@v4
+      - uses: ./
+        with:
+          path: ${{ github.workspace }}/test
+          main: test_error.py
+          run: false
+      - name: Ensure file exists
+        shell: bash
+        run: |
+          cd "${{ github.workspace }}/test"
+          if ! [ -f dist/test_error.bin ]; then
+            tree
+            echo "Error: dist/test_error.bin is missing!"
+            exit 1
+          fi
