@@ -5,7 +5,7 @@ See [action.yml](action.yml) for the possible inputs.
 
 # Usage
 ```yaml
-- uses: Eeems-Org/remarkable-nuitka-build-action@v1
+- uses: Eeems-Org/remarkable-nuitka-build-action@v2
   with:
     main: hello.py
 ```
