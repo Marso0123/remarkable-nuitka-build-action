@@ -65,15 +65,21 @@ inputs:
   ccache_key:
     description: Key used for nuitka ccache
     required: false
-    default: ${{ github.job }}-remarkable-2.15.1
 runs:
   using: composite
   steps:
+    - name: Get defaults
+      id: defaults
+      shell: bash
+      run: |
+        echo "ccache_key=$ccache_key" >> $GITHUB_OUTPUT
+      env:
+        ccache_key: ${{ github.job }}-remarkable-ccache-${{ inputs.main }}
     - name: Nuitka ccache
       uses: actions/cache@v3
       with:
         path: ${{ inputs.path }}/.nuitka
-        key: ${{ inputs.ccache_key }}
+        key: ${{ inputs.ccache_key || steps.defaults.outputs.ccache_key }}
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
     - name: Set up Docker Buildx
