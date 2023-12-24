@@ -77,6 +77,8 @@ runs:
         extra_flags: ${{ inputs.extra_flags }}
         ccache_key: ${{ inputs.ccache_key || ''}}
         default_ccache_key: ${{ github.job }}-remarkable-ccache-${{ inputs.main }}
+        src_path: ${{ inputs.path }}
+        main: ${{ inputs.main }}
     - name: Nuitka ccache
       uses: actions/cache@v3
       with:

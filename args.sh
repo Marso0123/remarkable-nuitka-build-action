@@ -12,3 +12,14 @@ else
 fi
 
 setOutputVar extra_flags "$(echo "$extra_flags" | toArray)"
+
+src_path="$(realpath "$src_path")"
+main="$(realpath "$main")"
+main_path="${src_path}/${main}"
+
+setOutputVar main_file "$(
+  realpath \
+    --canonicalize-missing \
+    --relative-to="$GITHUB_WORKSPACE"
+    "${src_path}/${main}"
+)"
