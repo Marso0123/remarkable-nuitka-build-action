@@ -109,7 +109,6 @@ runs:
               --main="${{ inputs.main }}" \
               $(echo "${{ inputs.extra_flags }}" | tr '\n' ' ')
         EOF
-        tree "$src_path"
       env:
         src_path: ${{ inputs.path }}
         workspace: ${{ github.workspace }}
@@ -120,6 +119,7 @@ runs:
         fw_version: 2.15.1
         clean_cache: ${{ inputs.clean_docker_cache }}
         run: |
+          set -e
           find "${{ inputs.output_dir }}" -name '*.bin' \
             | xargs -rn1 \
             | while read -r bin; do

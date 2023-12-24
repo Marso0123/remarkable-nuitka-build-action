@@ -28,3 +28,12 @@ jobs:
           main: test.py
           run: true
           python_version: ${{ matrix.python }}
+      - name: Ensure file exists
+        shell: bash
+        run: |
+          cd "${{ github.workspace }}/test"
+          if ! [ -f dist/test.bin ]; then
+            tree
+            echo "Error: dist/test.bin is missing!"
+            exit 1
+          fi
