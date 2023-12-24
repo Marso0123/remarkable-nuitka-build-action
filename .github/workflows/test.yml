@@ -10,8 +10,11 @@ on:
 
 jobs:
   test:
-    name: Test
+    name: Test ${{ matrix.python }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.9', '3.12']
     steps:
       - name: Checkout the Git repository
         uses: actions/checkout@v4
@@ -20,3 +23,4 @@ jobs:
           path: ${{ github.workspace }}/test
           main: test.py
           run: true
+          python_version: ${{ matrix.python }}
