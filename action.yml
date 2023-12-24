@@ -92,6 +92,7 @@ runs:
             echo "export LC_ALL=C" >> ~/.bashrc
             apt install -y \
               ccache \
+              clang \
               curl \
               git \
               libffi-dev \
@@ -113,7 +114,7 @@ runs:
               eval "$(pyenv init -)"
               eval "$(pyenv virtualenv-init -)"
               pyenv install "${{ inputs.python_version }}"
-              pyenv shell "${{ inputs.python_version }}"
+              pyenv global "${{ inputs.python_version }}"
             fi
             python3 -m venv /opt/lib/nuitka
             source /opt/lib/nuitka/bin/activate
