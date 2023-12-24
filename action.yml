@@ -105,9 +105,9 @@ runs:
           bash -ec "$script" 2>&1 \
         | while read -r line; do
           if [[ "$line" == 'Nuitka'*':ERROR:'* ]]; then
-            echo "::error file=${{ inputs.main }},title=Nuitka Error::$line"
+            echo "::error file=${{ steps.args.outputs.main_file }},title=Nuitka Error::$line"
           elif [[ "$line" == 'Nuitka'*':WARNING:'* ]]; then
-            echo "::warning file=${{ inputs.main }},title=Nuitka Warning::$line"
+            echo "::warning file=${{ steps.args.outputs.main_file }},title=Nuitka Warning::$line"
           elif [[ "$line" == 'Nuitka:INFO:'* ]]; then
             echo "$line"
           else
@@ -117,7 +117,6 @@ runs:
       env:
         src_path: ${{ inputs.path }}
         script: |
-          echo "::error::This is a test"
           source /opt/lib/nuitka/bin/activate
           cd /src
           if [ -f requirements.txt ]; then
