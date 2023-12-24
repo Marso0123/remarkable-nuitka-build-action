@@ -79,7 +79,7 @@ runs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
     - name: Clean old buildx cache
-      if: ${{ inputs.clean_docker_cache }}
+      if: ${{ input.clean_docker_cache == true || input.clean_docker_cache == 'true' }}
       shell: bash
       run: |
         docker buildx prune -f
@@ -110,7 +110,7 @@ runs:
             --main="${{ inputs.main }}" \
             ${{ inputs.extra_flags }}
     - name: Run executable
-      if: ${{ false }}
+      if: ${{ input.run == true || input.run == 'true' }}
       uses: Eeems-Org/run-in-remarkable-action@v1
       with:
         path: ${{ inputs.path }}/${{ inputs.output_dir }}
