@@ -51,10 +51,9 @@ inputs:
   python_version:
     description: Python version to use
     required: false
-    default: '3.12'
+    default: '3.11'
     type: choice
     options:
-      - '3.12'
       - '3.11'
       - '3.10'
       - '3.9'
@@ -88,30 +87,29 @@ runs:
     - name: Run container
       shell: bash
       run: |
-        cd "$workspace"
+        read -r -d '' script <<'EOF'
+          source /opt/lib/nuitka/bin/activate
+          cd /src
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          NUITKA_CACHE_DIR="/src/.nuitka" \
+          nuitka3 \
+            --${{ inputs.mode }} \
+            --lto=${{ inputs.lto }} \
+            --static-libpython=yes \
+            --output-dir="/src/${{ inputs.output_dir }}" \
+            --main="${{ inputs.main }}" \
+            $(echo "${{ inputs.extra_flags }}" | tr '\n' ' ')
+        EOF
         docker run \
           --rm \
           --platform=linux/arm/v7 \
-          -v "$src_path":/src \
+          -v "${src_path}":/src \
           eeems/nuitka-arm-builder:bullseye-${{ inputs.python_version }} \
-          bash -ex <<'EOF'
-            source /opt/lib/nuitka/bin/activate
-            cd /src
-            if [ -f requirements.txt ]; then
-              pip install -r requirements.txt
-            fi
-            NUITKA_CACHE_DIR="/src/.nuitka" \
-            nuitka3 \
-              --${{ inputs.mode }} \
-              --lto=${{ inputs.lto }} \
-              --static-libpython=yes \
-              --output-dir="/src/${{ inputs.output_dir }}" \
-              --main="${{ inputs.main }}" \
-              $(echo "${{ inputs.extra_flags }}" | tr '\n' ' ')
-        EOF
+          bash -exc "$script"
       env:
-        src_path: ${{ inputs.path }}
-        workspace: ${{ github.workspace }}
+        src_path: ${{ github.workspace }}/${{ inputs.path }}
     - uses: Eeems-Org/run-in-remarkable-action@v1
       if: ${{ inputs.run }}
       with:
