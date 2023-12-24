@@ -103,9 +103,11 @@ runs:
           -v "${src_path}":/src \
           eeems/nuitka-arm-builder:bullseye-${{ inputs.python_version }} \
           bash -ec "$script"
+        echo "::error::This is a test"
       env:
         src_path: ${{ inputs.path }}
         script: |
+          echo "::error::This is a test"
           source /opt/lib/nuitka/bin/activate
           cd /src
           if [ -f requirements.txt ]; then
