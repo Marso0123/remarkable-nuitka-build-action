@@ -112,12 +112,12 @@ runs:
     - uses: Eeems-Org/run-in-remarkable-action@v1
       if: ${{ inputs.run }}
       with:
-        path: ${{ inputs.path }}
+        path: ${{ inputs.path }}/${{ inputs.output_dir }}
         fw_version: 2.15.1
         clean_cache: ${{ inputs.clean_docker_cache }}
         run: |
           set -e
-          find "${{ inputs.output_dir }}" -name '*.bin' \
+          find . -name '*.bin' \
             | xargs -rn1 \
             | while read -r bin; do
               echo "Running $(basename "$bin")"
