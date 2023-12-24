@@ -37,11 +37,11 @@ inputs:
     description: Extra flags to pass to nuitka
     required: false
     default: |
-      --assume-yes-for-downloads \
-      --warn-implicit-exceptions \
-      --warn-unusual-code \
-      --remove-output \
-      --enable-plugin=pylint-warnings \
+      --assume-yes-for-downloads
+      --warn-implicit-exceptions
+      --warn-unusual-code
+      --remove-output
+      --enable-plugin=pylint-warnings
       --enable-plugin=upx
   run:
     description: Execute immediately after compilation
@@ -68,18 +68,20 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Get defaults
-      id: defaults
+    - name: Parse arguments
+      id: args
       shell: bash
-      run: |
-        echo "ccache_key=$ccache_key" >> $GITHUB_OUTPUT
+      run: ./args.sh
+      working-directory: ${{ github.action_path }}
       env:
-        ccache_key: ${{ github.job }}-remarkable-ccache-${{ inputs.main }}
+        extra_flags: ${{ inputs.extra_flags }}
+        ccache_key: ${{ inputs.ccache_key || ''}}
+        default_ccache_key: ${{ github.job }}-remarkable-ccache-${{ inputs.main }}
     - name: Nuitka ccache
       uses: actions/cache@v3
       with:
         path: ${{ inputs.path }}/.nuitka
-        key: ${{ inputs.ccache_key || steps.defaults.outputs.ccache_key }}
+        key: ${{ steps.args.outputs.ccache_key }}
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
     - name: Set up Docker Buildx
@@ -98,7 +100,7 @@ runs:
           --platform=linux/arm/v7 \
           -v "${src_path}":/src \
           eeems/nuitka-arm-builder:bullseye-${{ inputs.python_version }} \
-          bash -exc "$script"
+          bash -ec "$script"
       env:
         src_path: ${{ inputs.path }}
         script: |
@@ -115,7 +117,8 @@ runs:
             --static-libpython=yes \
             --output-dir="/src/${{ inputs.output_dir }}" \
             --main="${{ inputs.main }}" \
-            ${{ inputs.extra_flags }} 2>&1 \
+            ${{ join(fromJSON(steps.args.outputs.extra_flags), ' ') }} \
+            2>&1 \
           | while read -r line; do
             if [[ "$line" == 'Nuitka'*':ERROR:'* ]]; then
               echo "::error::$line"
