@@ -1,7 +1,10 @@
 FROM arm32v7/debian:bullseye
 
 RUN <<EOT
-  apt install -y \
+  set -ex
+  export DEBIAN_FRONTEND="noninteractive"
+  apt-get update
+  apt-get install -y \
     ccache \
     clang \
     curl \
@@ -11,19 +14,17 @@ RUN <<EOT
     python3-dev \
     upx
   curl https://pyenv.run | bash
-  echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
-  echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
-  echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-  echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
   export PYENV_ROOT="$HOME/.pyenv"
   export PATH="$PYENV_ROOT/bin:$PATH"
-  eval "$(pyenv init -)"
-  eval "$(pyenv virtualenv-init -)"
-  pyenv install "${{ inputs.python_version }}"
-  pyenv global "${{ inputs.python_version }}"
+  eval "\$(pyenv init -)"
+  eval "\$(pyenv virtualenv-init -)"
+  pyenv install "\${{ inputs.python_version }}"
+  pyenv global "\${{ inputs.python_version }}"
   python3 -m venv /opt/lib/nuitka
   source /opt/lib/nuitka/bin/activate
   pip install \
     --extra-index-url https://wheels.eeems.codes/ \
     nuitka
+  apt-get clean
+  rm -rf /var/lib/apt/lists/*
 EOT
