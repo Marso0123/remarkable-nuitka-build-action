@@ -109,12 +109,24 @@ runs:
           fi
           NUITKA_CACHE_DIR="/src/.nuitka" \
           nuitka3 \
+            --verbose \
             --${{ inputs.mode }} \
             --lto=${{ inputs.lto }} \
             --static-libpython=yes \
             --output-dir="/src/${{ inputs.output_dir }}" \
             --main="${{ inputs.main }}" \
-            ${{ inputs.extra_flags }}
+            ${{ inputs.extra_flags }} 2>&1 \
+          | while read -r line; do
+            if [[ "$line" == 'Nuitka'*':ERROR:'* ]]; then
+              echo "::error::$line"
+            elif [[ "$line" == 'Nuitka'*':WARNING:'* ]]; then
+              echo "::warning::$line"
+            elif [[ "$line" == 'Nuitka:INFO:'* ]]; then
+              echo "$line"
+            else
+              echo "::debug::$line"
+            fi
+          done
     - name: Run executable
       if: ${{ inputs.run == true || inputs.run == 'true' }}
       uses: Eeems-Org/run-in-remarkable-action@v1
