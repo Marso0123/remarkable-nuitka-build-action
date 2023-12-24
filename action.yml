@@ -109,7 +109,7 @@ runs:
           eeems/nuitka-arm-builder:bullseye-${{ inputs.python_version }} \
           bash -exc "$script"
       env:
-        src_path: ${{ github.workspace }}/${{ inputs.path }}
+        src_path: ${{ inputs.path }}
     - uses: Eeems-Org/run-in-remarkable-action@v1
       if: ${{ inputs.run }}
       with:
