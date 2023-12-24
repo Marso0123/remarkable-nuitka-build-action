@@ -33,15 +33,6 @@ inputs:
       - 'yes'
       - 'no'
       - auto
-  static_libpython:
-    description: Use static link library for python
-    type: choice
-    required: false
-    default: auto
-    options:
-      - 'yes'
-      - 'no'
-      - auto
   extra_flags:
     description: Extra flags to pass to nuitka
     required: false
@@ -100,11 +91,10 @@ runs:
         cd "$workspace"
         docker run \
           --rm \
-          --platform=linux/arm \
+          --platform=linux/arm/v7 \
           -v "$src_path":/src \
           eeems/nuitka-arm-builder:bullseye-${{ inputs.python_version }} \
-          bash -x <<'EOF'
-            set -e
+          bash -ex <<'EOF'
             source /opt/lib/nuitka/bin/activate
             cd /src
             if [ -f requirements.txt ]; then
@@ -114,7 +104,7 @@ runs:
             nuitka3 \
               --${{ inputs.mode }} \
               --lto=${{ inputs.lto }} \
-              --static-libpython=${{ inputs.static_libpython }} \
+              --static-libpython=no \
               --output-dir="/src/${{ inputs.output_dir }}" \
               --main="${{ inputs.main }}" \
               $(echo "${{ inputs.extra_flags }}" | tr '\n' ' ')
