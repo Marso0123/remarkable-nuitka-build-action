@@ -84,7 +84,7 @@ runs:
       run: |
         docker buildx prune -f
         docker image prune -f
-    - name: Run container
+    - name: Build executable
       shell: bash
       run: |
         docker run \
@@ -109,8 +109,9 @@ runs:
             --output-dir="/src/${{ inputs.output_dir }}" \
             --main="${{ inputs.main }}" \
             ${{ inputs.extra_flags }}
-    - uses: Eeems-Org/run-in-remarkable-action@v1
-      if: ${{ inputs.run }}
+    - name: Run executable
+      if: inputs.run
+      uses: Eeems-Org/run-in-remarkable-action@v1
       with:
         path: ${{ inputs.path }}/${{ inputs.output_dir }}
         fw_version: 2.15.1
