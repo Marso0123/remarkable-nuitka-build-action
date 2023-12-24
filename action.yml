@@ -104,7 +104,7 @@ runs:
             nuitka3 \
               --${{ inputs.mode }} \
               --lto=${{ inputs.lto }} \
-              --static-libpython=no \
+              --static-libpython=yes \
               --output-dir="/src/${{ inputs.output_dir }}" \
               --main="${{ inputs.main }}" \
               $(echo "${{ inputs.extra_flags }}" | tr '\n' ' ')
