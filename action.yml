@@ -76,7 +76,7 @@ runs:
       env:
         extra_flags: ${{ inputs.extra_flags }}
         ccache_key: ${{ inputs.ccache_key || ''}}
-        default_ccache_key: ${{ github.job }}-remarkable-ccache-${{ inputs.main }}
+        default_ccache_key: ${{ github.job }}-remarkable-ccache-${{ inputs.python_version }}-${{ inputs.main }}
         src_path: ${{ inputs.path }}
         main: ${{ inputs.main }}
     - name: Nuitka ccache
@@ -102,8 +102,18 @@ runs:
           --platform=linux/arm/v7 \
           -v "${src_path}":/src \
           eeems/nuitka-arm-builder:bullseye-${{ inputs.python_version }} \
-          bash -ec "$script"
-        echo "::error::This is a test"
+          bash -ec "$script" 2>&1 \
+        | while read -r line; do
+          if [[ "$line" == 'Nuitka'*':ERROR:'* ]]; then
+            echo "::error file=${{ inputs.main }},title=Nuitka Error::$line"
+          elif [[ "$line" == 'Nuitka'*':WARNING:'* ]]; then
+            echo "::warning file=${{ inputs.main }},title=Nuitka Warning::$line"
+          elif [[ "$line" == 'Nuitka:INFO:'* ]]; then
+            echo "$line"
+          else
+            echo "::debug::$line"
+          fi
+        done
       env:
         src_path: ${{ inputs.path }}
         script: |
@@ -121,19 +131,7 @@ runs:
             --static-libpython=yes \
             --output-dir="/src/${{ inputs.output_dir }}" \
             --main="${{ inputs.main }}" \
-            ${{ join(fromJSON(steps.args.outputs.extra_flags), ' ') }} \
-            2>&1 \
-          | while read -r line; do
-            if [[ "$line" == 'Nuitka'*':ERROR:'* ]]; then
-              echo "::error file=${{ inputs.main }},title=Nuitka Error::$line"
-            elif [[ "$line" == 'Nuitka'*':WARNING:'* ]]; then
-              echo "::warning file=${{ inputs.main }},title=Nuitka Warning::$line"
-            elif [[ "$line" == 'Nuitka:INFO:'* ]]; then
-              echo "$line"
-            else
-              echo "::debug::$line"
-            fi
-          done
+            ${{ join(fromJSON(steps.args.outputs.extra_flags), ' ') }}
     - name: Run executable
       if: ${{ inputs.run == true || inputs.run == 'true' }}
       uses: Eeems-Org/run-in-remarkable-action@v1
