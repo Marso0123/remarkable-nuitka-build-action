@@ -110,7 +110,7 @@ runs:
             --main="${{ inputs.main }}" \
             ${{ inputs.extra_flags }}
     - name: Run executable
-      if: inputs.run
+      if: ${{ false }}
       uses: Eeems-Org/run-in-remarkable-action@v1
       with:
         path: ${{ inputs.path }}/${{ inputs.output_dir }}
