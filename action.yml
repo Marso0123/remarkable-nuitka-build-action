@@ -115,10 +115,11 @@ runs:
               --${{ inputs.mode }} \
               --lto=${{ inputs.lto }} \
               --static-libpython=${{ inputs.static_libpython }} \
-              --output-dir="${{ inputs.output_dir }}" \
+              --output-dir="/src/${{ inputs.output_dir }}" \
               --main="${{ inputs.main }}" \
               $(echo "${{ inputs.extra_flags }}" | tr '\n' ' ')
         EOF
+        tree "$src_path"
       env:
         src_path: ${{ inputs.path }}
         workspace: ${{ github.workspace }}
