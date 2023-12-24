@@ -61,6 +61,12 @@ inputs:
     description: Python version to use
     required: false
     default: '3.12'
+    type: choice
+    options:
+      - '3.12'
+      - '3.11'
+      - '3.10'
+      - '3.9'
   clean_docker_cache:
     description: Clean the local docker cache before running
     required: false
@@ -88,15 +94,6 @@ runs:
       run: |
         docker buildx prune -f
         docker image prune -f
-    - name: Build image
-      uses: docker/build-push-action@v5
-      with:
-        tags: remarkable-nuitka-build-action:latest
-        load: true
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        context: ${{ github.action_path }}
-        platforms: linux/arm/v7
     - name: Run container
       shell: bash
       run: |
@@ -105,12 +102,9 @@ runs:
           --rm \
           --platform=linux/arm \
           -v "$src_path":/src \
-          remarkable-nuitka-build-action:latest bash -x <<'EOF'
+          eeems/nuitka-arm-builder:bullseye-${{ inputs.python_version }} \
+          bash -x <<'EOF'
             set -e
-            export PYENV_ROOT="$HOME/.pyenv"
-            export PATH="$PYENV_ROOT/bin:$PATH"
-            eval "$(pyenv init -)"
-            eval "$(pyenv virtualenv-init -)"
             source /opt/lib/nuitka/bin/activate
             cd /src
             if [ -f requirements.txt ]; then
