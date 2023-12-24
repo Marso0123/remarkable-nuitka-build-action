@@ -78,6 +78,8 @@ runs:
       with:
         path: ${{ inputs.path }}/.nuitka
         key: ${{ inputs.ccache_key }}
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
     - name: Clean old buildx cache
@@ -86,10 +88,6 @@ runs:
       run: |
         docker buildx prune -f
         docker image prune -f
-    - name: Setup multiarch
-      shell: bash
-      run: |
-        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
     - name: Build image
       uses: docker/build-push-action@v5
       with:
@@ -98,6 +96,7 @@ runs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
         context: ${{ github.action_path }}
+        platforms: linux/arm/v7
     - name: Run container
       shell: bash
       run: |
