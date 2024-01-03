@@ -1,3 +1,4 @@
+#!/bin/bash
 toArray() {
   jq --raw-input | jq --compact-output --slurp '.'
 }
@@ -20,6 +21,6 @@ main_path="${src_path}/${main}"
 setOutputVar main_file "$(
   realpath \
     --canonicalize-missing \
-    --relative-to="$GITHUB_WORKSPACE"
+    --relative-to="$GITHUB_WORKSPACE" \
     "${src_path}/${main}"
 )"
