@@ -1,0 +1,3 @@
+uses: Eeems-Org/remarkable-nuitka-build-action@v2
+  with:
+    main: hello.py
