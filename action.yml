@@ -99,7 +99,7 @@ runs:
       run: |
         docker run \
           --rm \
-          --platform=linux/arm/v7 \  
+          --platform=linux/arm/v7 \
           -v "${src_path}":/src \
           eeems/nuitka-arm-builder:bullseye-${{ inputs.python_version }} \
           bash -ec "$script" 2>&1 \
