@@ -1,11 +1,5 @@
 name: build
 on:
-  pull_request:
-    branches:
-      - main
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
@@ -36,6 +30,11 @@ jobs:
             echo "Error: dist/test.bin is missing!"
             exit 1
           fi
+      - name: Upload test.bin as an artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-binary-${{ matrix.python }}
+          path: ${{ github.workspace }}/test/dist/test.bin
   test-no-run:
     name: Test Without Running
     runs-on: ubuntu-latest
